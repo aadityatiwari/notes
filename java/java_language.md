@@ -40,10 +40,10 @@
 
 -   Servlets are server-side Java EE components that generate responses (typically HTML pages) to requests (typically HTTP requests) from clients. A servlet runs on the server side.
 
--   **import** **java.io.\***;
-
--   **import** **javax.servlet.\***;
-
+> **import** **java.io.\***;
+>
+> **import** **javax.servlet.\***;
+>
 > **public** **class** **Hello** **extends** GenericServlet {
 >
 > **public** void service(**final** ServletRequest request, **final** ServletResponse response)
