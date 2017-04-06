@@ -20,6 +20,8 @@ Index of topics
 - computer_science
 	> * garbage_collection.md
 	> * reference.md
+	> * x86_and_x64.md
+	> * endianness.md
 	
 
 - java
