@@ -7,10 +7,14 @@ Description
 This repository contains my study notes mainly in markdown format on different topics related to Computer Science. The primary source of these contents are [Wikipedia articles](https://en.wikipedia.org). The intent of sharing these summarized notes is to make it available to whosoever needs it for a quick reference.
 
 ### Directories
->**computer-architecture**: Notes on random topics related to computer systems architecture design and implementation.
->**computer_science**: Notes on range of topics from computer science discipline.
->**design-pattern**: Notes on formalized best practices and categories of software design patterns.
->**java**: Notes on different concepts related to Java programming language.
+
+- **computer-architecture**: Notes on random topics related to computer systems architecture design and implementation.
+
+- **computer-science**: Notes on range of topics from computer science discipline.
+
+- **design-pattern**: Notes on formalized best practices and categories of software design patterns.
+
+- **java**: Notes on different concepts related to Java programming language.
 
 
 Index of topics
