@@ -35,4 +35,5 @@ Index of topics
 	> * java_objects_memory_usage.md
 	> * java_class_file.md
 	> * java_bytecode.md
+	> * java_annotation.md
 
