@@ -1,7 +1,7 @@
 [Java annotation](https://en.wikipedia.org/wiki/Java_annotation)
 ----------
 
--   An **annotation** is a form of syntactic [metadata] (https://en.wikipedia.org/wiki/Metadata) that can be added to [Java] (https://en.wikipedia.org/wiki/Java_(programming_language)) source code.
+-   An **annotation** is a form of syntactic [metadata](https://en.wikipedia.org/wiki/Metadata) that can be added to [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) source code.
 
 -   Classes, methods, variables, parameters and packages may be annotated.
 
