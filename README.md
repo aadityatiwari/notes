@@ -34,6 +34,7 @@ Index of topics
 
 - **design-pattern**
 	> * oop_factory.md
+	> * dependency-injection.md
 
 
 
