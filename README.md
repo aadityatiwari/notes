@@ -20,34 +20,32 @@ This repository contains my study notes mainly in markdown format on different t
 Index of topics
 -----
 
-- **computer-architecture**
-	> * endianness.md
-	> * nuxi_problem.md
-	> * x86_and_x64.md
-
-
-- **computer_science**
-	> * garbage_collection.md
-	> * reference.md
-	
+- **java**
+	> * java-software-platform.md
+	> * java-language.md
+	> * jvm.md
+	> * jdk.md
+	> * jvm-hotspot.md
+	> * java-performance.md
+	> * java-objects-memory-usage.md
+	> * java-class-file.md
+	> * java-bytecode.md
+	> * java-annotation.md
 
 
 - **design-pattern**
-	> * oop_factory.md
+	> * oop-factory.md
 	> * dependency-injection.md
 	> * software-design-patterns.md
 
 
 
-- **java**
-	> * java-software-platform.md
-	> * java_language.md
-	> * jvm.md
-	> * jdk.md
-	> * jvm_hotspot.md
-	> * java_performance.md
-	> * java_objects_memory_usage.md
-	> * java_class_file.md
-	> * java_bytecode.md
-	> * java_annotation.md
+- **computer-architecture**
+	> * endianness.md
+	> * nuxi-problem.md
+	> * x86-and-x64.md
 
+
+- **computer-science**
+	> * garbage-collection.md
+	> * reference.md
