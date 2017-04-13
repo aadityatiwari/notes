@@ -1,4 +1,4 @@
-[SDP\_1.0: Software design pattern](https://en.wikipedia.org/wiki/Software_design_pattern)
+[Software design pattern](https://en.wikipedia.org/wiki/Software_design_pattern)
 ----------
 
 A software design pattern is a general reusable solution to a commonly occurring problem within a given context in software design.
