@@ -20,7 +20,7 @@ Design patterns were originally
     -  [creational patterns](https://en.wikipedia.org/wiki/Creational_pattern)
     -  [structural patterns](https://en.wikipedia.org/wiki/Structural_pattern)
     -  [behavioral patterns](https://en.wikipedia.org/wiki/Behavioral_pattern)
-    -  [Concurrency patterns](https://en.wikipedia.org/wiki/Concurrency_pattern)
+    -  [concurrency patterns](https://en.wikipedia.org/wiki/Concurrency_pattern)
 
 -	Described using the concepts of
     -  [delegation](https://en.wikipedia.org/wiki/Delegation_(programming))
