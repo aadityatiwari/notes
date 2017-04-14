@@ -8,19 +8,19 @@ This repository contains my study notes mainly in markdown format on different t
 
 ### Directories
 
-- **computer-architecture**: Notes on random topics related to computer systems architecture design and implementation.
-
-- **computer-science**: Notes on range of topics from computer science discipline.
+- **java**: Notes on different concepts related to Java programming language.
 
 - **design-pattern**: Notes on formalized best practices and categories of software design patterns.
 
-- **java**: Notes on different concepts related to Java programming language.
+- **computer-architecture**: Notes on random topics related to computer systems architecture design and implementation.
+
+- **computer-science**: Notes on range of topics from computer science discipline.
 
 
 Index of topics
 -----
 
-- **java**
+- ### **Java**
 	> * java-software-platform.md
 	> * java-language.md
 	> * jvm.md
@@ -33,19 +33,31 @@ Index of topics
 	> * java-annotation.md
 
 
-- **design-pattern**
+- ### **Design Patterns**
 	> * oop-factory.md
 	> * dependency-injection.md
 	> * software-design-patterns.md
+	> * creational-patterns.md
+	> * structural-patterns.md
+	> * behavioral-patterns.md
+	> * concurrency-patterns.md
+	
+	#### *creational-patterns*
+	
+	#### *structural-patterns*
+	
+	#### *behavioral-patterns*
+	
+	#### *concurrency-patterns*
 
 
 
-- **computer-architecture**
+- ### **Computer Architecture**
 	> * endianness.md
 	> * nuxi-problem.md
 	> * x86-and-x64.md
 
 
-- **computer-science**
+- ### **Computer Science**
 	> * garbage-collection.md
 	> * reference.md
