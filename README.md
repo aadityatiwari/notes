@@ -42,13 +42,13 @@ Index of topics
 	> * behavioral-patterns.md
 	> * concurrency-patterns.md
 	
-	#### *creational-patterns*
+	#### *1-creational-patterns*
 	
-	#### *structural-patterns*
+	#### *2-structural-patterns*
 	
-	#### *behavioral-patterns*
+	#### *3-behavioral-patterns*
 	
-	#### *concurrency-patterns*
+	#### *4-concurrency-patterns*
 
 
 
