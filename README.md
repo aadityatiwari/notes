@@ -43,6 +43,13 @@ Index of topics
 	> * concurrency-patterns.md
 	
 	#### *1-creational-patterns*
+	> * Abstract factory pattern
+	> * Factory method pattern
+	> * Builder pattern
+	> * Multiton pattern
+	> * Object pool pattern
+	> * Prototype pattern
+	> * Singleton pattern
 	
 	#### *2-structural-patterns*
 	
