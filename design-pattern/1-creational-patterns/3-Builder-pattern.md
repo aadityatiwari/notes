@@ -1,0 +1,1 @@
+This package contain notes related to different flavours of creational design patterns
