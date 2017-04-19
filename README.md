@@ -52,6 +52,12 @@ Index of topics
 	> * Singleton pattern
 	
 	#### *2-structural-patterns*
+	> * adapter pattern
+	> * bridge pattern
+	> * composite pattern
+	> * decorator pattern
+	> * facade pattern
+	> * flyweight pattern
 	
 	#### *3-behavioral-patterns*
 	
