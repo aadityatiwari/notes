@@ -1,4 +1,5 @@
 [Double dispatch](https://en.wikipedia.org/wiki/Double_dispatch)
+-----------
 
 **Double dispatch** is a special form of [multiple dispatch](https://en.wikipedia.org/wiki/Multiple_dispatch), and a mechanism that dispatches a function call to different concrete functions depending on the runtime types of two objects involved in the call.
 
