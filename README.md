@@ -21,27 +21,27 @@ Index of topics
 -----
 
 - ### **Java**
-	> * java-software-platform.md
-	> * java-language.md
-	> * jvm.md
-	> * jdk.md
-	> * jvm-hotspot.md
-	> * java-performance.md
-	> * java-objects-memory-usage.md
-	> * java-class-file.md
-	> * java-bytecode.md
-	> * java-annotation.md
+	> * java-software-platform
+	> * java-language
+	> * jvm
+	> * jdk
+	> * jvm-hotspot
+	> * java-performance
+	> * java-objects-memory-usage
+	> * java-class-file
+	> * java-bytecode
+	> * java-annotation
 
 
 - ### **Design Patterns**
-	> * oop-factory.md
-	> * dependency-injection.md
-	> * software-design-patterns.md
-	> * creational-patterns.md
-	> * structural-patterns.md
-	> * behavioral-patterns.md
-	> * concurrency-patterns.md
-	> * double-dispatch.md
+	> * oop-factory
+	> * dependency-injection
+	> * software-design-patterns
+	> * creational-patterns
+	> * structural-patterns
+	> * behavioral-patterns
+	> * concurrency-patterns
+	> * double-dispatch
 	
 	#### *1-creational-patterns*
 	> * Abstract factory pattern
@@ -65,21 +65,21 @@ Index of topics
 	> *  Command pattern
 	> *  Interpreter pattern
 	> *  Mediator pattern
-	> *  Memento Pattern
+	> *  Memento pattern
 	> *  Observer pattern
 	> *  Strategy pattern
-	> *  Visitor Pattern
+	> *  Visitor pattern
 	
 	#### *4-concurrency-patterns*
 
 
 
 - ### **Computer Architecture**
-	> * endianness.md
-	> * nuxi-problem.md
-	> * x86-and-x64.md
+	> * endianness
+	> * nuxi-problem
+	> * x86-and-x64
 
 
 - ### **Computer Science**
-	> * garbage-collection.md
-	> * reference.md
+	> * garbage-collection
+	> * reference
