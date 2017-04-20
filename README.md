@@ -60,6 +60,15 @@ Index of topics
 	> * flyweight pattern
 	
 	#### *3-behavioral-patterns*
+	> *  Chain-of-responsibility pattern
+	> *  Command pattern
+	> *  Interpreter pattern
+	> *  Mediator pattern
+	> *  Memento Pattern
+	> *  Observer pattern
+	> *  Strategy pattern
+	> *  Visitor Pattern
+
 	
 	#### *4-concurrency-patterns*
 
