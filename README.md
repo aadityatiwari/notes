@@ -41,6 +41,7 @@ Index of topics
 	> * structural-patterns.md
 	> * behavioral-patterns.md
 	> * concurrency-patterns.md
+	> * double-dispatch.md
 	
 	#### *1-creational-patterns*
 	> * Abstract factory pattern
@@ -68,7 +69,6 @@ Index of topics
 	> *  Observer pattern
 	> *  Strategy pattern
 	> *  Visitor Pattern
-
 	
 	#### *4-concurrency-patterns*
 
