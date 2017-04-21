@@ -71,7 +71,19 @@ Index of topics
 	> *  Visitor pattern
 	
 	#### *4-concurrency-patterns*
-
+	> * Active object
+	> * Balking pattern
+	> * Double-checked locking
+	> * Asynchronous method invocation
+	> * Guarded suspension
+	> * Join pattern
+	> * Lock
+	> * Monitor (synchronization)
+	> * Sample Mesa-monitor implementation with Test-and-Set
+	> * Readers-writer lock
+	> * Thread-local_storage
+	> * Thread pool
+	> * Scheduling
 
 
 - ### **Computer Architecture**
