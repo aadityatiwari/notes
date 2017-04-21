@@ -79,7 +79,6 @@ Index of topics
 	> * Join pattern
 	> * Lock
 	> * Monitor (synchronization)
-	> * Sample Mesa-monitor implementation with Test-and-Set
 	> * Readers-writer lock
 	> * Thread-local_storage
 	> * Thread pool
