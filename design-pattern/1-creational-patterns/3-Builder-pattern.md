@@ -1,4 +1,5 @@
 [Builder pattern](https://en.wikipedia.org/wiki/Builder_pattern)
+---------------------
 
 The **builder pattern** is an [object creation](https://en.wikipedia.org/wiki/Creational_pattern) software [design pattern](https://en.wikipedia.org/wiki/Design_pattern_(computer_science))
 
@@ -14,8 +15,8 @@ The intent of the Builder design pattern is to separate the construction of a co
 
 Example: We have a Car class. The problem is that a car has many options. The combination of each option would lead to a huge list of constructors for this class. So we will create a builder class, CarBuilder. We will send to the CarBuilder each car option step by step and then construct the final car with the right options.
 
-```java
 
+```java
 class Car {
 
 	private int wheels;
@@ -46,14 +47,11 @@ class Car {
 	}
 }
 
-// The builder abstraction.
-
+// The builder abstraction
 interface CarBuilder {
 
 	void setWheels(final int wheels);
-
 	void setColor(final String color);
-
 	Car getResult();
 }
 
@@ -85,31 +83,20 @@ public class CarBuildDirector {
 	private CarBuilder builder;
 
 	public CarBuildDirector(final CarBuilder builder) {
-
 		this.builder = builder;
-
 	}
 
 	Car construct() {
-
 		builder.setWheels(4);
-
 		builder.setColor("Red");
-
 		return builder.getResult();
-
 	}
 
 	public static void main(final String[] arguments) {
-
 		CarBuilder builder = new CarBuilderImpl();
-
 		CarBuildDirector carBuildDirector = new CarBuildDirector(builder);
-
 		System.out.println(carBuildDirector.construct());
-
 	}
-
 }
 
 ```
