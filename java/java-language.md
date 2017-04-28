@@ -42,8 +42,8 @@ Servlets are server-side Java EE components that generate responses (typically H
 
 
 ```java
-import java.io. * ;
-import javax.servlet. * ;
+import java.io.* ;
+import javax.servlet.* ;
 
 public class Hello extends GenericServlet {
 
