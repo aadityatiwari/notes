@@ -4,7 +4,7 @@ Study notes
 Description
 -----
 
-This repository contains my study notes mainly in markdown format on different topics related to Computer Science. The primary source of these contents are [Wikipedia articles](https://en.wikipedia.org). The intent of sharing these summarized notes is to make it available to whosoever needs it for a quick reference.
+This repository contains my study notes on different topics related to Computer Science. The primary source of these contents is [Wikipedia articles](https://en.wikipedia.org). The intent of sharing these summarized notes is to make it available to whosoever needs it for a quick reference.
 
 ### Directories
 
