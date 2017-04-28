@@ -3,6 +3,10 @@
 
 The **Java Development Kit** (**JDK**) is an implementation of either one of the [Java Platform, Standard Edition](https://en.wikipedia.org/wiki/Java_Platform,_Standard_Edition); [Java Platform, Enterprise Edition](https://en.wikipedia.org/wiki/Java_Platform,_Enterprise_Edition) or [Java Platform, Micro Edition](https://en.wikipedia.org/wiki/Java_Platform,_Micro_Edition) platforms released by [Oracle Corporation](https://en.wikipedia.org/wiki/Oracle_Corporation) in the form of a binary product.
 
+
+The JDK also comes with a complete [Java Runtime Environment](https://en.wikipedia.org/wiki/Java_Runtime_Environment), usually called a *private* runtime, due to the fact that it is separated from the "regular" JRE and has extra contents. It consists of a [Java Virtual Machine](https://en.wikipedia.org/wiki/Java_Virtual_Machine) and all of the class libraries present in the production environment, as well as additional libraries only useful to developers, such as the [internationalization](https://en.wikipedia.org/wiki/Internationalization_and_localization) libraries and the [IDL](https://en.wikipedia.org/wiki/Interface_description_language) libraries.
+
+
 The JDK has as its primary components a collection of programming tools, including:
 
 >- [**appletviewer**](https://en.wikipedia.org/wiki/AppletViewer) – this tool can be used to run and debug Java applets without a web browser
@@ -66,6 +70,3 @@ The JDK has as its primary components a collection of programming tools, includi
 >- **wsimport** – generates portable [JAX-WS](https://en.wikipedia.org/wiki/JAX-WS) artifacts for invoking a web service.
 >
 >- **xjc** – Part of the Java API for XML Binding (JAXB) API. It accepts an XML schema and generates Java classes.
-
-
-The JDK also comes with a complete [Java Runtime Environment](https://en.wikipedia.org/wiki/Java_Runtime_Environment), usually called a *private* runtime, due to the fact that it is separated from the "regular" JRE and has extra contents. It consists of a [Java Virtual Machine](https://en.wikipedia.org/wiki/Java_Virtual_Machine) and all of the class libraries present in the production environment, as well as additional libraries only useful to developers, such as the [internationalization](https://en.wikipedia.org/wiki/Internationalization_and_localization) libraries and the [IDL](https://en.wikipedia.org/wiki/Interface_description_language) libraries.
