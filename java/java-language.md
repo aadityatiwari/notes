@@ -41,7 +41,7 @@ The [**System**](https://docs.oracle.com/javase/8/docs/api/java/lang/System.htm
 Servlets are server-side Java EE components that generate responses (typically HTML pages) to requests (typically HTTP requests) from clients. A servlet runs on the server side.
 
 
-	```java
+```java
 	import java.io. * ;
 	import javax.servlet. * ;
 
@@ -60,7 +60,7 @@ Servlets are server-side Java EE components that generate responses (typically H
 			}
 		}
 	}
-	```
+```
 
 
 GenericServlet class provides the interface for the [server](https://en.wikipedia.org/wiki/Server_(computing)) to forward requests to the servlet and control the servlet's lifecycle.
