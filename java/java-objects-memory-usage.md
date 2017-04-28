@@ -1,11 +1,7 @@
-
 [Java objects memory usage](http://www.javamex.com/tutorials/memory/object_memory_usage.shtml)
 -----------
 
 The **heap memory used by a Java object in Hotspot** consists of:
-
-
-
 -   an **object header**, consisting of a few bytes of "housekeeping" information;
 -   memory for **primitive fields**, according to their size;
 -   memory for **reference fields** (4 bytes each);
