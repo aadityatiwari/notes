@@ -7,7 +7,7 @@ The class itself can be thought of as the *abstraction* and what the class can d
 
 The **bridge pattern** is often confused with the adapter pattern. In fact, the **bridge pattern** is often implemented using the [**class adapter pattern**](https://en.wikipedia.org/wiki/Adapter_pattern#Class_Adapter_pattern)
 
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Bridge_UML_class_diagram.svg/750px-Bridge_UML_class_diagram.svg.png" alt="Bridge UML class diagram.svg" width="499" height="249" />
+>    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Bridge_UML_class_diagram.svg/750px-Bridge_UML_class_diagram.svg.png" alt="Bridge UML class diagram.svg" width="499" height="249" />
 
 **Abstraction (abstract class)**
 -   defines the abstract interface
