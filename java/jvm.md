@@ -1,7 +1,9 @@
 [Java Virtual Machine](https://en.wikipedia.org/wiki/Java_virtual_machine)
 -----------------
 
-A **Java virtual machine** (**JVM**) is [an abstract computing machine](https://en.wikipedia.org/wiki/Virtual_machine#Process_virtual) that enables a computer to run a [Java](https://en.wikipedia.org/wiki/Java_(software_platform)) program. There are three notions of the JVM specification, implementation and instance. 
+A **Java virtual machine** (**JVM**) is [an abstract computing machine](https://en.wikipedia.org/wiki/Virtual_machine#Process_virtual) that enables a computer to run a [Java](https://en.wikipedia.org/wiki/Java_(software_platform)) program. 
+
+There are three notions of the JVM: specification, implementation and instance. 
 
 An instance of a JVM is an implementation running in a [process](https://en.wikipedia.org/wiki/Process_(computing)) that executes a computer program compiled into [Java bytecode](https://en.wikipedia.org/wiki/Java_bytecode).
 
