@@ -25,7 +25,8 @@ The observer pattern also does not deal with recording the "events", the asynchr
 
 > <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Observer.svg/500px-Observer.svg.png" alt="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Observer.svg/500px-Observer.svg.png" width="499" height="207" />
 > 
-> 
+---------------------------
+>
 > <img src="media/op-1.png" alt="Observer pattern" width="529" height="332" />
 
 Below is an example written in [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) that takes keyboard input and treats each input line as an event. The example is built upon the library classes [java.util.Observer](http://docs.oracle.com/javase/8/docs/api/java/util/Observer.html) and [java.util.Observable](http://docs.oracle.com/javase/8/docs/api/java/util/Observable.html). When a string is supplied from System.in, the method notifyObservers is then called, in order to notify all observers of the event's occurrence, in the form of an invocation of their 'update' methods.
