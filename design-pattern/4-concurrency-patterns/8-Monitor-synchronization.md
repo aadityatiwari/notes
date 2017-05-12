@@ -106,3 +106,38 @@ public method consumer(){
 This method assures that an inconsistent state does not occur, but wastes CPU resources due to the unnecessary busy-waiting.
 
 What is needed is a way to make producer threads block until the queue is non-full, and a way to make consumer threads block until the queue is non-empty.
+
+
+**Condition variables**
+-------------------
+
+For many applications, mutual exclusion is not enough. Threads attempting an operation may need to wait until some condition *P* holds true.
+
+A busy waiting loop "**while not( P ) do skip**" will not work, as mutual exclusion will prevent any other thread from entering the monitor to make the condition true.
+
+What is needed is a way to signal the thread when the condition P is true (or *could* be true).
+
+A condition variable is a queue of threads, associated with a monitor, on which a thread may wait for some condition to become true.
+
+Each condition variable *c* is associated with an [assertion](https://en.wikipedia.org/wiki/Assertion_(computing)) *P<sub>c</sub>*. While a thread is waiting on a condition variable, that thread is not considered to occupy the monitor, and so **other threads** may enter the monitor to change the monitor's state.
+
+In most types of monitors, **these other threads** may **signal the condition variable** *c* to indicate that assertion *P<sub>c</sub>* is true in the current state.
+
+There are two main operations on condition variables:
+
+-   **wait** c, m: c is condition variable and m is a mutex(lock) associated with the monitor. fundamental contract, of the "wait" operation, is to do the following steps atomically:
+> 
+> 1.  release the mutex *m*,
+> 2.  move this thread from the "ready queue" to *c*'s "wait-queue" (a.k.a. "sleep-queue") of threads, and
+> 3.  sleep this thread. (Context is synchronously yielded to another thread.)
+> 
+		*The atomicity of the operations within step 1 is important to avoid race conditions that would be caused by a preemptive thread switch in-between them. One failure mode that could occur if these were not atomic is a missed wakeup, in which the thread could be on c's sleep-queue and have released the mutex, but a preemptive thread switch occurred before the thread went to sleep, and another thread called a signal/notify operation (see below) on c moving the first thread back out of c's queue. As soon as the first thread in question is switched back to, its program counter will be at step 1c, and it will sleep and be unable to be woken up again, violating the invariant that it should have been on c's sleep-queue when it slept. *
+
+-   **signal** c**:** Also known as notify c, is called by a thread to indicate that the assertion Pc is true. Depending on the type and implementation of the monitor, this moves one or more threads from c's sleep-queue to the "ready queue" or another queues for it to be executed. It is usually considered a best practice to perform the "signal"/"notify" operation before releasing mutex *m* that is associated with *c.*
+
+-   The **broadcast** c, also known as **notifyAll** c, is a similar operation that wakes up all threads in c's wait-queue. This empties the wait-queue. Generally, when more than one predicate condition is associated with the same condition variable, the application will require **broadcast** instead of **signal** because a thread waiting for the wrong condition might be woken up and then immediately go back to sleep without waking up a thread waiting for the correct condition that just became true. Otherwise, if the predicate condition is one-to-one with the condition variable associated with it, then **signal** may be more efficient than **broadcast**.
+
+As a design rule, multiple condition variables can be associated with the same mutex, but not vice versa.
+
+In the producer-consumer example, The **"producer"** threads will want to wait on a monitor using **lock m and a condition variable c\_{full}** which blocks until the queue is non-full. The **"consumer"** threads will want to wait on a different monitor using the **same mutex m but a different condition variable c\_{empty}** which blocks until the queue is non-empty.
+
