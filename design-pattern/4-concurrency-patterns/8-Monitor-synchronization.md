@@ -107,9 +107,8 @@ This method assures that an inconsistent state does not occur, but wastes CPU re
 
 What is needed is a way to make producer threads block until the queue is non-full, and a way to make consumer threads block until the queue is non-empty.
 
-
 **Condition variables**
--------------------
+---------------
 
 For many applications, mutual exclusion is not enough. Threads attempting an operation may need to wait until some condition *P* holds true.
 
@@ -131,7 +130,8 @@ There are two main operations on condition variables:
 > 2.  move this thread from the "ready queue" to *c*'s "wait-queue" (a.k.a. "sleep-queue") of threads, and
 > 3.  sleep this thread. (Context is synchronously yielded to another thread.)
 > 
-		*The atomicity of the operations within step 1 is important to avoid race conditions that would be caused by a preemptive thread switch in-between them. One failure mode that could occur if these were not atomic is a missed wakeup, in which the thread could be on c's sleep-queue and have released the mutex, but a preemptive thread switch occurred before the thread went to sleep, and another thread called a signal/notify operation (see below) on c moving the first thread back out of c's queue. As soon as the first thread in question is switched back to, its program counter will be at step 1c, and it will sleep and be unable to be woken up again, violating the invariant that it should have been on c's sleep-queue when it slept. *
+> *The atomicity of the operations within step 1 is important to avoid race conditions that would be caused by a preemptive thread switch in-between them. One failure mode that could occur if these were not atomic is a missed wakeup, in which the thread could be on c's sleep-queue and have released the mutex, but a preemptive thread switch occurred before the thread went to sleep, and another thread called a signal/notify operation (see below) on c moving the first thread back out of c's queue. As soon as the first thread in question is switched back to, its program counter will be at step 1c, and it will sleep and be unable to be woken up again, violating the invariant that it should have been on c's sleep-queue when it slept.*
+> 
 
 -   **signal** c**:** Also known as notify c, is called by a thread to indicate that the assertion Pc is true. Depending on the type and implementation of the monitor, this moves one or more threads from c's sleep-queue to the "ready queue" or another queues for it to be executed. It is usually considered a best practice to perform the "signal"/"notify" operation before releasing mutex *m* that is associated with *c.*
 
