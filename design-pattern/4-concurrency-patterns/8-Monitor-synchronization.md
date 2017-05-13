@@ -122,7 +122,7 @@ Each condition variable *c* is associated with an [assertion](https://en.wikiped
 
 In most types of monitors, **these other threads** may **signal the condition variable** *c* to indicate that assertion *P<sub>c</sub>* is true in the current state.
 
-There are two main operations on condition variables:
+There are three main operations on condition variables:
 
 -   **wait** c, m: c is condition variable and m is a mutex(lock) associated with the monitor. fundamental contract, of the "wait" operation, is to do the following steps atomically:
 > 
@@ -133,7 +133,7 @@ There are two main operations on condition variables:
 > *The atomicity of the operations within step 1 is important to avoid race conditions that would be caused by a preemptive thread switch in-between them. One failure mode that could occur if these were not atomic is a missed wakeup, in which the thread could be on c's sleep-queue and have released the mutex, but a preemptive thread switch occurred before the thread went to sleep, and another thread called a signal/notify operation (see below) on c moving the first thread back out of c's queue. As soon as the first thread in question is switched back to, its program counter will be at step 1c, and it will sleep and be unable to be woken up again, violating the invariant that it should have been on c's sleep-queue when it slept.*
 > 
 
--   **signal** c**:** Also known as notify c, is called by a thread to indicate that the assertion Pc is true. Depending on the type and implementation of the monitor, this moves one or more threads from c's sleep-queue to the "ready queue" or another queues for it to be executed. It is usually considered a best practice to perform the "signal"/"notify" operation before releasing mutex *m* that is associated with *c.*
+-   **signal** c: Also known as notify c, is called by a thread to indicate that the assertion Pc is true. Depending on the type and implementation of the monitor, this moves one or more threads from c's sleep-queue to the "ready queue" or another queues for it to be executed. It is usually considered a best practice to perform the "signal"/"notify" operation before releasing mutex *m* that is associated with *c.*
 
 -   The **broadcast** c, also known as **notifyAll** c, is a similar operation that wakes up all threads in c's wait-queue. This empties the wait-queue. Generally, when more than one predicate condition is associated with the same condition variable, the application will require **broadcast** instead of **signal** because a thread waiting for the wrong condition might be woken up and then immediately go back to sleep without waking up a thread waiting for the correct condition that just became true. Otherwise, if the predicate condition is one-to-one with the condition variable associated with it, then **signal** may be more efficient than **broadcast**.
 
@@ -141,3 +141,104 @@ As a design rule, multiple condition variables can be associated with the same m
 
 In the producer-consumer example, The **"producer"** threads will want to wait on a monitor using **lock m and a condition variable c\_{full}** which blocks until the queue is non-full. The **"consumer"** threads will want to wait on a different monitor using the **same mutex m but a different condition variable c\_{empty}** which blocks until the queue is non-empty.
 
+
+**Monitor usage:**
+------------
+
+```
+acquire(m); // Acquire this monitor's lock.
+while (!p) { // While the condition/predicate/assertion that we are waiting for is not true...
+	wait(m, cv); // Wait on this monitor's lock and condition variable.
+}
+
+// ... Critical section of code goes here ...
+
+signal(cv2); //-- OR -- notifyAll(cv2); cv2 might be the same as cv or different.
+release(m); // Release this monitor's lock.
+
+```
+
+To be more precise, this is the same pseudocode but with more verbose comments to better explain what is going on:
+
+```java
+
+// ... (previous code)
+// About to enter the monitor.
+// Acquire the advisory mutex (lock) associated with the concurrent data that is shared between threads, 
+// to ensure that no two threads can be preemptively interleaved or run simultaneously on different cores
+// while executing in critical sections that read or write this same concurrent data.
+// If another thread is holding this mutex, then this thread will be sleeped (blocked) and placed on
+// m's sleep queue.  (Mutex "m" shall not be a spin-lock.)
+acquire(m);
+// Now, we are holding the lock and can check the condition for the first time.
+
+// The first time we execute the while loop condition after the above "acquire", we are asking,
+// "Does the condition/predicate/assertion we are waiting for happen to already be true?"
+
+while ( ! p() ) // "p" is any expression (e.g. variable or function-call) that checks the condition
+				// and evaluates to boolean.  This itself is a critical section, so you *MUST*
+				// be holding the lock when executing this "while" loop condition!
+				
+// If this is not the first time the "while" condition is being checked, then we are asking the question,
+// "Now that another thread using this monitor has notified me and woken me up and I have been
+// context-switched back to, did the condition/predicate/assertion we are waiting on stay true between
+// the time that I was woken up and the time that I
+// re-acquired the lock inside the "wait" call in the last iteration of this loop,
+// or did some other thread cause the condition to become false again in the meantime
+// thus making this a spurious wakeup?
+
+{
+	// If this is the first iteration of the loop, then the answer is "no" -- the condition is not ready yet.
+	// Otherwise, the answer is: the latter.  This was a spurious wakeup, some other thread occurred first
+	// and caused the condition to become false again, and we must wait again.
+
+	wait(m, cv);
+		// Temporarily prevent any other thread on any core from doing operations on m or cv.
+		// release(m) 	// Atomically release lock "m" so other code using this concurrent data
+		// 				// can operate, move this thread to cv's wait-queue so that it will be notified
+		//				// sometime when the condition becomes true, and sleep this thread.
+		//				// Re-enable other threads and cores to do operations on m and cv.
+		//
+		// Context switch occurs on this core.
+		//
+		// At some future time, the condition we are waiting for becomes true,
+		// and another thread using this monitor (m, cv) does either a signal/notify
+		// that happens to wake this thread up, or a notifyAll that wakes us up, meaning
+		// that we have been taken out of cv's wait-queue.
+		//
+		// During this time, other threads may be switched to that caused the condition to become
+		// false again, or the condition may toggle one or more times, or it may happen to
+		// stay true.
+		//
+		// This thread is switched back to on some core.
+		//
+		// acquire(m)	// Lock "m" is re-acquired.
+		
+	// End this loop iteration and re-check the "while" loop condition to make sure the predicate is
+	// still true.
+	
+}
+
+// The condition we are waiting for is true!
+// We are still holding the lock, either from before entering the monitor or from the
+// last execution of "wait".
+
+// Critical section of code goes here, which has a precondition that our predicate
+// must be true.
+// This code might make cv's condition false, and/or make other condition variables'
+// predicates true.
+
+// Call signal/notify or notifyAll, depending on which condition variables' predicates
+// (who share mutex m) have been made true or may have been made true, and the monitor semantic type
+// being used.
+
+for (cv_x in cvs_to_notify){
+	notify(cv_x); //-- OR -- notifyAll(cv_x);
+}
+// One or more threads have been woken up but will block as soon as they try
+// to acquire m.
+
+// Release the mutex so that notified thread(s) and others can enter
+// their critical sections.
+release(m);
+```
