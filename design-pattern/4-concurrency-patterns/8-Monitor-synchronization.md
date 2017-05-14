@@ -242,3 +242,147 @@ for (cv_x in cvs_to_notify){
 // their critical sections.
 release(m);
 ```
+
+**Solving the bounded producer/consumer problem**
+-----------
+
+The classic solution is to use **two monitors**, comprising **two condition variables** sharing **one lock** on the queue.
+
+```java
+global volatile RingBuffer queue; // A thread-unsafe ring-buffer of tasks.
+global Lock queueLock;  // A mutex for the ring-buffer of tasks.  (Not a spin-lock.)
+global CV queueEmptyCV; // A condition variable for consumer threads waiting for the queue to become non-empty. Its associated lock is "queueLock".
+global CV queueFullCV; // A condition variable for producer threads waiting for the queue to become non-full. Its associated lock is also "queueLock".
+
+// Method representing each producer thread's behavior:
+public method producer(){
+    while(true){
+        task myTask=...; // Producer makes some new task to be added.
+
+        queueLock.acquire(); // Acquire lock for initial predicate check.
+        while(queue.isFull()){ // Check if the queue is non-full.
+            // Make the threading system atomically release queueLock,
+            // enqueue this thread onto queueFullCV, and sleep this thread.
+            wait(queueLock, queueFullCV);
+            // Then, "wait" automatically re-acquires "queueLock" for re-checking
+            // the predicate condition.
+        }
+        
+        // Critical section that requires the queue to be non-full.
+        // N.B.: We are holding queueLock.
+        queue.enqueue(myTask); // Add the task to the queue.
+
+        // Now the queue is guaranteed to be non-empty, so signal a consumer thread
+        // or all consumer threads that might be blocked waiting for the queue to be non-empty:
+        signal(queueEmptyCV); -- OR -- notifyAll(queueEmptyCV);
+        
+        // End of critical sections related to the queue.
+        queueLock.release(); // Drop the queue lock until we need it again to add the next task.
+    }
+}
+
+// Method representing each consumer thread's behavior:
+public method consumer(){
+    while(true){
+
+        queueLock.acquire(); // Acquire lock for initial predicate check.
+        while (queue.isEmpty()){ // Check if the queue is non-empty.
+            // Make the threading system atomically release queueLock,
+            // enqueue this thread onto queueEmptyCV, and sleep this thread.
+            wait(queueLock, queueEmptyCV);
+            // Then, "wait" automatically re-acquires "queueLock" for re-checking
+            // the predicate condition.
+        }
+        // Critical section that requires the queue to be non-empty.
+        // N.B.: We are holding queueLock.
+        myTask=queue.dequeue(); // Take a task off of the queue.
+        // Now the queue is guaranteed to be non-full, so signal a producer thread
+        // or all producer threads that might be blocked waiting for the queue to be non-full:
+        signal(queueFullCV); -- OR -- notifyAll(queueFullCV);
+
+        // End of critical sections related to the queue.
+        queueLock.release(); // Drop the queue lock until we need it again to take off the next task.
+
+        doStuff(myTask); // Go off and do something with the task.
+    }
+}
+```
+
+A variant of this solution could use a single condition variable for both producers and consumers, perhaps named "queueFullOrEmptyCV" or "queueSizeChangedCV".  However, doing this would require using *notifyAll* in all the threads using the condition variable and cannot use a regular *signal*. This is because the regular *signal* might wake up a thread of the wrong type whose condition has not yet been met, and that thread would go back to sleep without a thread of the correct type getting signalled.
+
+For example, a producer might make the queue full and wake up another producer instead of a consumer, and the woken producer would go back to sleep. In the complementary case, a consumer might make the queue empty and wake up another consumer instead of a producer, and the consumer would go back to sleep. Using *notifyAll* ensures that some thread of the right type will proceed as expected by the problem statement.
+
+*Here is the **variant** using only **one condition variable** and **notifyAll**:*
+
+```java
+global volatile RingBuffer queue; // A thread-unsafe ring-buffer of tasks.
+global Lock queueLock; // A mutex for the ring-buffer of tasks.  (Not a spin-lock.)
+
+global CV queueFullOrEmptyCV; // A single condition variable for when the queue is not ready for
+// any  thread -- i.e., for producer threads waiting for the queue to become non-full 
+// and consumer threads waiting for the queue to become non-empty.
+// Its associated lock is "queueLock". 
+// Not safe to use regular "signal" because it is associated with
+// multiple predicate conditions (assertions).
+
+// Method representing each producer thread's behavior:
+public method producer(){
+    while(true){
+        task myTask=...; // Producer makes some new task to be added.
+
+        queueLock.acquire(); 	// Acquire lock for initial predicate check.
+        while(queue.isFull()){ 	// Check if the queue is non-full.
+            			// Make the threading system atomically release queueLock,
+            			// enqueue this thread onto the CV, and sleep this thread.
+            wait(queueLock, queueFullOrEmptyCV);
+            // Then, "wait" automatically re-acquires "queueLock" for re-checking
+            // the predicate condition.
+        }
+        
+        // Critical section that requires the queue to be non-full.
+        // N.B.: We are holding queueLock.
+        queue.enqueue(myTask); // Add the task to the queue.
+
+        // Now the queue is guaranteed to be non-empty, so signal all blocked threads
+        // so that a consumer thread will take a task:
+        notifyAll(queueFullOrEmptyCV); // Do not use "signal" (as it might wake up another producer instead).
+        
+        // End of critical sections related to the queue.
+        queueLock.release(); // Drop the queue lock until we need it again to add the next task.
+    }
+}
+
+// Method representing each consumer thread's behavior:
+public method consumer(){
+    while(true){
+
+        queueLock.acquire(); // Acquire lock for initial predicate check.
+        while (queue.isEmpty()){ 	// Check if the queue is non-empty.
+           			 // Make the threading system atomically release queueLock,
+           			 // enqueue this thread onto the CV, and sleep this thread.
+            wait(queueLock, queueFullOrEmptyCV);
+            // Then, "wait" automatically re-acquires "queueLock" for re-checking
+            // the predicate condition.
+        }
+        // Critical section that requires the queue to be non-full.
+        // N.B.: We are holding queueLock.
+        myTask=queue.dequeue(); // Take a task off of the queue.
+
+        // Now the queue is guaranteed to be non-full, so signal all blocked threads
+        // so that a producer thread will take a task:
+        notifyAll(queueFullOrEmptyCV); // Do not use "signal" (as it might wake up another consumer instead).
+
+        // End of critical sections related to the queue.
+        queueLock.release(); // Drop the queue lock until we need it again to take off the next task.
+
+        doStuff(myTask); // Go off and do something with the task.
+    }
+}
+```
+
+Locks and condition variables are higher-level abstractions over **synchronization primitives** provided by hardware support that provides [atomicity](https://en.wikipedia.org/wiki/Atomic_operation).
+
+On a uniprocessor, disabling and enabling interrupts is a way to implement monitors by preventing context switches during the critical sections of the locks and condition variables, but this is not enough on a multiprocessor.
+
+On a multiprocessor, usually special atomic **read-modify-write** instructions on the memory such as **test-and-set**, [**compare-and-swap**](https://en.wikipedia.org/wiki/Compare-and-swap), etc. are used, depending on what the [ISA](https://en.wikipedia.org/wiki/Instruction_set) provides.
+
