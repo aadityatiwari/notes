@@ -1,4 +1,4 @@
-[Monitor (synchronization)](https://en.wikipedia.org/wiki/Monitor_(synchronization))
+Monitor (synchronization)
 ------------------
 
 A **monitor** is a synchronization construct that allows [threads](https://en.wikipedia.org/wiki/Thread_(computing)) to have both [mutual exclusion](https://en.wikipedia.org/wiki/Mutual_exclusion) and the ability to wait (block) for a certain condition to become true.
