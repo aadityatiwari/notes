@@ -386,3 +386,237 @@ On a uniprocessor, disabling and enabling interrupts is a way to implement monit
 
 On a multiprocessor, usually special atomic **read-modify-write** instructions on the memory such as **test-and-set**, [**compare-and-swap**](https://en.wikipedia.org/wiki/Compare-and-swap), etc. are used, depending on what the [ISA](https://en.wikipedia.org/wiki/Instruction_set) provides.
 
+*Sample Mesa-monitor implementation with Test-and-Set*
+-----------
+
+```java
+// Basic parts of threading system:
+// Assume "ThreadQueue" supports random access.
+public volatile ThreadQueue readyQueue; // Thread-unsafe queue of ready threads.  Elements are (Thread*).
+public volatile global Thread* currentThread; // Assume this variable is per-core.  (Others are shared.)
+
+// Implements a spin-lock on just the synchronized state of the threading system itself.
+// This is used with test-and-set as the synchronization primitive.
+public volatile global bool threadingSystemBusy=false;
+
+// Context-switch interrupt service routine (ISR):
+// On the current CPU core, preemptively switch to another thread.
+public method contextSwitchISR(){
+    if (testAndSet(threadingSystemBusy)){
+        return; // Can't switch context right now.
+    }
+
+    // Ensure this interrupt can't happen again which would foul up the context switch:
+    systemCall_disableInterrupts();
+
+    // Get all of the registers of the currently-running process.
+    // For Program Counter (PC), we will need the instruction location of
+    // the "resume" label below.  Getting the register values is platform-dependent and may involve
+    // reading the current stack frame, JMP/CALL instructions, etc.  (The details are beyond this scope.)
+    currentThread->registers = getAllRegisters(); // Store the registers in the "currentThread" object in memory.
+    currentThread->registers.PC = resume; // Set the next PC to the "resume" label below in this method.
+
+    readyQueue.enqueue(currentThread); // Put this thread back onto the ready queue for later execution.
+    
+    Thread* otherThread=readyQueue.dequeue(); // Remove and get the next thread to run from the ready queue.
+    
+    currentThread=otherThread; // Replace the global current-thread pointer value so it is ready for the next thread.
+
+    // Restore the registers from currentThread/otherThread, including a jump to the stored PC of the other thread
+    // (at "resume" below).  Again, the details of how this is done are beyond this scope.
+    restoreRegisters(otherThread.registers);
+
+    // *** Now running "otherThread" (which is now "currentThread")!  The original thread is now "sleeping". ***
+
+    resume: // This is where another contextSwitch() call needs to set PC to when switching context back here.
+
+    // Return to where otherThread left off.
+
+    threadingSystemBusy=false; // Must be an atomic assignment.
+    systemCall_enableInterrupts(); // Turn pre-emptive switching back on on this core.
+
+}
+
+// Thread sleep method:
+// On current CPU core, a synchronous context switch to another thread without putting
+// the current thread on the ready queue.
+// Must be holding "threadingSystemBusy" and disabled interrupts so that this method
+// doesn't get interrupted by the thread-switching timer which would call contextSwitchISR().
+// After returning from this method, must clear "threadingSystemBusy".
+public method threadSleep(){
+    // Get all of the registers of the currently-running process.
+    // For Program Counter (PC), we will need the instruction location of
+    // the "resume" label below.  Getting the register values is platform-dependent and may involve
+    // reading the current stack frame, JMP/CALL instructions, etc.  (The details are beyond this scope.)
+    currentThread->registers = getAllRegisters(); // Store the registers in the "currentThread" object in memory.
+    currentThread->registers.PC = resume; // Set the next PC to the "resume" label below in this method.
+
+    // Unlike contextSwitchISR(), we will not place currentThread back into readyQueue.
+    // Instead, it has already been placed onto a mutex's or condition variable's queue.
+    
+    Thread* otherThread=readyQueue.dequeue(); // Remove and get the next thread to run from the ready queue.
+    
+    currentThread=otherThread; // Replace the global current-thread pointer value so it is ready for the next thread.
+
+    // Restore the registers from currentThread/otherThread, including a jump to the stored PC of the other thread
+    // (at "resume" below).  Again, the details of how this is done are beyond this scope.
+    restoreRegisters(otherThread.registers);
+
+    // *** Now running "otherThread" (which is now "currentThread")!  The original thread is now "sleeping". ***
+
+    resume: // This is where another contextSwitch() call needs to set PC to when switching context back here.
+
+    // Return to where otherThread left off.
+    
+}
+
+public method wait(Mutex m, ConditionVariable c){
+    // Internal spin-lock while other threads on any core are accessing this object's
+    // "held" and "threadQueue", or "readyQueue".
+    while (testAndSet(threadingSystemBusy)){}
+    // N.B.: "threadingSystemBusy" is now true.
+    
+    // System call to disable interrupts on this core so that threadSleep() doesn't get interrupted by
+    // the thread-switching timer on this core which would call contextSwitchISR().
+    // Done outside threadSleep() for more efficiency so that this thread will be sleeped
+    // right after going on the condition-variable queue.
+    systemCall_disableInterrupts();
+ 
+    assert m.held; // (Specifically, this thread must be the one holding it.)
+    
+    m.release();
+    c.waitingThreads.enqueue(currentThread);
+    
+    threadSleep();
+    
+    // Thread sleeps ... Thread gets woken up from a signal/broadcast.
+    
+    threadingSystemBusy=false; // Must be an atomic assignment.
+    systemCall_enableInterrupts(); // Turn pre-emptive switching back on on this core.
+    
+    // Mesa style:
+    // Context switches may now occur here, making the client caller's predicate false.
+    
+    m.acquire();
+    
+}
+
+public method signal(ConditionVariable c){
+
+    // Internal spin-lock while other threads on any core are accessing this object's
+    // "held" and "threadQueue", or "readyQueue".
+    while (testAndSet(threadingSystemBusy)){}
+    // N.B.: "threadingSystemBusy" is now true.
+    
+    // System call to disable interrupts on this core so that threadSleep() doesn't get interrupted by
+    // the thread-switching timer on this core which would call contextSwitchISR().
+    // Done outside threadSleep() for more efficiency so that this thread will be sleeped
+    // right after going on the condition-variable queue.
+    systemCall_disableInterrupts();
+    
+    if (!c.waitingThreads.isEmpty()){
+        wokenThread=c.waitingThreads.dequeue();
+        readyQueue.enqueue(wokenThread);
+    }
+    
+    threadingSystemBusy=false; // Must be an atomic assignment.
+    systemCall_enableInterrupts(); // Turn pre-emptive switching back on on this core.
+    
+    // Mesa style:
+    // The woken thread is not given any priority.
+    
+}
+
+public method broadcast(ConditionVariable c){
+
+    // Internal spin-lock while other threads on any core are accessing this object's
+    // "held" and "threadQueue", or "readyQueue".
+    while (testAndSet(threadingSystemBusy)){}
+    // N.B.: "threadingSystemBusy" is now true.
+    
+    // System call to disable interrupts on this core so that threadSleep() doesn't get interrupted by
+    // the thread-switching timer on this core which would call contextSwitchISR().
+    // Done outside threadSleep() for more efficiency so that this thread will be sleeped
+    // right after going on the condition-variable queue.
+    systemCall_disableInterrupts();
+    
+    while (!c.waitingThreads.isEmpty()){
+        wokenThread=c.waitingThreads.dequeue();
+        readyQueue.enqueue(wokenThread);
+    }
+    
+    threadingSystemBusy=false; // Must be an atomic assignment.
+    systemCall_enableInterrupts(); // Turn pre-emptive switching back on on this core.
+    
+    // Mesa style:
+    // The woken threads are not given any priority.
+    
+}
+
+class Mutex {
+    protected volatile bool held=false;
+    private volatile ThreadQueue blockingThreads; // Thread-unsafe queue of blocked threads.  Elements are (Thread*).
+    
+    public method acquire(){
+        // Internal spin-lock while other threads on any core are accessing this object's
+        // "held" and "threadQueue", or "readyQueue".
+        while (testAndSet(threadingSystemBusy)){}
+        // N.B.: "threadingSystemBusy" is now true.
+        
+        // System call to disable interrupts on this core so that threadSleep() doesn't get interrupted by
+        // the thread-switching timer on this core which would call contextSwitchISR().
+        // Done outside threadSleep() for more efficiency so that this thread will be sleeped
+        // right after going on the lock queue.
+        systemCall_disableInterrupts();
+
+        assert !blockingThreads.contains(currentThread);
+
+        if (held){
+            // Put "currentThread" on this lock's queue so that it will be
+            // considered "sleeping" on this lock.
+            // Note that "currentThread" still needs to be handled by threadSleep().
+            readyQueue.remove(currentThread);
+            blockingThreads.enqueue(currentThread);
+            threadSleep();
+            
+            // Now we are woken up, which must be because "held" became false.
+            assert !held;
+            assert !blockingThreads.contains(currentThread);
+        }
+        
+        held=true;
+        
+        threadingSystemBusy=false; // Must be an atomic assignment.
+        systemCall_enableInterrupts(); // Turn pre-emptive switching back on on this core.
+
+    }        
+        
+    public method release(){
+        // Internal spin-lock while other threads on any core are accessing this object's
+        // "held" and "threadQueue", or "readyQueue".
+        while (testAndSet(threadingSystemBusy)){}
+        // N.B.: "threadingSystemBusy" is now true.
+        
+        // System call to disable interrupts on this core for efficiency.
+        systemCall_disableInterrupts();
+        
+        assert held; // (Release should only be performed while the lock is held.)
+
+        held=false;
+        
+        if (!blockingThreads.isEmpty()){
+            Thread* unblockedThread=blockingThreads.dequeue();
+            readyQueue.enqueue(unblockedThread);
+        }
+        
+        threadingSystemBusy=false; // Must be an atomic assignment.
+        systemCall_enableInterrupts(); // Turn pre-emptive switching back on on this core.
+        
+    }
+}
+
+struct ConditionVariable {
+    volatile ThreadQueue waitingThreads;
+}
+
+```
