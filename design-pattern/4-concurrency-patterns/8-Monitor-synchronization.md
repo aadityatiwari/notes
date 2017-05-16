@@ -620,3 +620,38 @@ struct ConditionVariable {
 }
 
 ```
+
+*An example of Semaphore:*
+
+```
+class Semaphore
+{
+  private volatile int s := 0
+  invariant s >= 0
+  private ConditionVariable sIsPositive /* associated with s > 0 */
+  private Mutex myLock /* Lock on "s" */
+
+  public method P()
+  {
+    myLock.acquire()
+    while s = 0:
+      wait(myLock, sIsPositive)
+    assert s > 0
+    s := s - 1
+    myLock.release()
+  }
+
+  public method V()
+  {
+    myLock.acquire()
+    s := s + 1
+    assert s > 0
+    signal sIsPositive
+    myLock.release()
+  }
+}
+```
+
+When a **signal** happens on a condition variable that at least one other thread is waiting on, there are at least two threads that could then occupy the monitor: the thread that signals and any one of the threads that is waiting.
+
+
