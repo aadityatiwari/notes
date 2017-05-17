@@ -654,4 +654,170 @@ class Semaphore
 
 When a **signal** happens on a condition variable that at least one other thread is waiting on, there are at least two threads that could then occupy the monitor: the thread that signals and any one of the threads that is waiting.
 
+In order that at most one thread occupies the monitor at each time, a choice must be made. 
 
+This leads to two kinds of condition variables:
+> **Blocking condition variables** give priority to a signaled thread => **(Hoare-style monitor)**
+> **Non-blocking condition variables** give priority to the signaling thread => **(Mesa-style monitor)**
+
+
+**Blocking condition variables**:
+----------
+
+-   With a blocking condition variable, the signaling thread must wait outside the monitor (at least) until the signaled thread relinquishes occupancy of the monitor by either returning or by again waiting on a condition variable.
+
+-   Monitors using blocking condition variables are often called ***Hoare-style* monitors or *signal-and-urgent-wait* monitors.**
+
+> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Monitor_%28synchronization%29-SU.png/453px-Monitor_%28synchronization%29-SU.png" alt="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Monitor_%28synchronization%29-SU.png/453px-Monitor_%28synchronization%29-SU.png" width="410" height="286" />
+
+    A Hoare style monitor with two condition variables a and b.
+
+-   We assume there are two queues of threads associated with each monitor object
+-   e: The entrance queue
+-   s: A queue of threads that have signaled
+-   In addition, there is a queue c.q for threads waiting on each condition variable c
+
+```
+enter the monitor:
+    enter the method
+    if the monitor is locked
+        add this thread to e
+        block this thread
+    else
+        lock the monitor
+
+ leave the monitor:
+    schedule
+    return from the method
+
+ wait c :
+    add this thread to c.q
+    schedule
+    block this thread
+
+ signal c :
+    if there is a thread waiting on c.q
+        select and remove one such thread t from c.q
+        (t is called "the signaled thread")
+        add this thread to s
+        restart t
+        (so t will occupy the monitor next)
+        block this thread
+
+  schedule :
+    if there is a thread on s
+      select and remove one thread from s and restart it
+      (this thread will occupy the monitor next)
+    else if there is a thread on e
+      select and remove one thread from e and restart it
+      (this thread will occupy the monitor next)
+    else
+      unlock the monitor
+      (the monitor will become unoccupied)
+
+```
+
+Some implementations provide a **signal and return** operation that combines signaling with returning from a procedure.
+
+```
+signal c and return :
+    if there is a thread waiting on c.q
+        select and remove one such thread t from c.q
+        (t is called "the signaled thread")
+        restart t
+        (so t will occupy the monitor next)
+    else
+        schedule
+    return from the method
+```
+
+Example of a blocking monitor that implements a bounded, [thread-safe](https://en.wikipedia.org/wiki/Thread_safety) [stack](https://en.wikipedia.org/wiki/Stack_(data_structure)).
+
+
+```java
+monitor class SharedStack {
+  
+  private const capacity := 10
+  private int[capacity] A
+  private int size := 0
+
+  invariant 0 <= size and size <= capacity
+  private BlockingCondition theStackIsNotEmpty /* associated with 0 < size and size <= capacity */
+  private BlockingCondition theStackIsNotFull  /* associated with 0 <= size and size < capacity */
+  
+public method push(int value)
+  {
+    if size = capacity then wait theStackIsNotFull
+    assert 0 <= size and size < capacity
+    A[size] := value ; size := size + 1
+    assert 0 < size and size <= capacity
+    signal theStackIsNotEmpty and return
+  }
+  
+public method int pop()
+  {
+    if size = 0 then wait theStackIsNotEmpty
+    assert 0 < size and size <= capacity
+    size := size - 1 ;
+    assert 0 <= size and size < capacity
+    signal theStackIsNotFull  and return A[size]
+  }
+}
+```
+
+**Non-blocking condition variables:**
+-------------
+
+With *nonblocking condition variables* (also called *"Mesa style"* condition variables or *"signal and continue"* condition variables), signaling does not cause the signaling thread to lose occupancy of the monitor.
+
+Instead the signaled threads are moved to the e queue. There is no need for the s queue.
+
+With non-blocking condition variables, the **signal** operation is often called **notify.**
+
+It is also common to provide a **notify all** operation that moves all threads waiting on a condition variable to the e queue.
+
+> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Monitor_%28synchronization%29-Mesa.png/352px-Monitor_%28synchronization%29-Mesa.png" alt="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Monitor_%28synchronization%29-Mesa.png/352px-Monitor_%28synchronization%29-Mesa.png" width="442" height="426" />
+	A Mesa style monitor with two condition variables a and b
+
+```
+enter the monitor:
+    enter the method
+    if the monitor is locked
+      add this thread to e
+      block this thread
+    else
+      lock the monitor
+
+ leave the monitor:
+    schedule
+    return from the method
+
+ wait c :
+    add this thread to c.q
+    schedule
+    block this thread
+
+ notify c :
+    if there is a thread waiting on c.q
+        select and remove one thread t from c.q
+        (t is called "the notified thread")
+        move t to e
+
+ notify all c :
+    move all threads waiting on c.q to e
+
+  schedule :
+    if there is a thread on e
+      select and remove one thread from e and restart it
+    else
+      unlock the monitor
+```
+
+In [Java](https://en.wikipedia.org/wiki/Java_(programming_language)), each object may be used as a monitor. Methods or blocks of code requiring mutual exclusion must be explicitly marked with the [**synchronized**](https://en.wikipedia.org/wiki/Java_keyword) keyword.
+
+Rather than having explicit condition variables, each monitor (i.e. object) is equipped with a single wait queue in addition to its entrance queue.
+
+All waiting is done on this single wait queue and all **notify** and **notifyAll** operations apply to this queue. 
+
+> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Monitor_%28synchronization%29-Java.png/200px-Monitor_%28synchronization%29-Java.png" alt="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Monitor_%28synchronization%29-Java.png/200px-Monitor_%28synchronization%29-Java.png" width="242" height="318" />
+	A Java style monitor
