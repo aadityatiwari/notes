@@ -18,8 +18,10 @@ The size of a thread pool is the number of threads kept in reserve for executing
 The primary benefit of a thread pool over creating a new thread for each task is that thread creation and destruction overhead is restricted to the initial creation of the pool, which may result in better [performance](https://en.wikipedia.org/wiki/Performance_tuning) and better system [stability](https://en.wikipedia.org/wiki/Stability_Model).
 
 > <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Thread_pool.svg/400px-Thread_pool.svg.png" alt="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Thread_pool.svg/400px-Thread_pool.svg.png" width="400" height="207" />
-> *A sample thread pool (green boxes) with waiting tasks (blue) and completed tasks (yellow)*
 >
+> *A sample thread pool (green boxes) with waiting tasks (blue) and completed tasks (yellow)*
+
+
 > The Creating too many threads wastes resources and costs time creating the unused threads.
 > Destroying too many threads requires more time later when creating them again.
 > Creating threads too slowly might result in poor client performance (long wait times).
