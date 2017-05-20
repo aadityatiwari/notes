@@ -22,8 +22,8 @@ The primary benefit of a thread pool over creating a new thread for each task is
 > *A sample thread pool (green boxes) with waiting tasks (blue) and completed tasks (yellow)*
 
 
-> The Creating too many threads wastes resources and costs time creating the unused threads.
-> Destroying too many threads requires more time later when creating them again.
-> Creating threads too slowly might result in poor client performance (long wait times).
-> Destroying threads too slowly may starve other processes of resources.
+>- The Creating too many threads wastes resources and costs time creating the unused threads.
+>- Destroying too many threads requires more time later when creating them again.
+>- Creating threads too slowly might result in poor client performance (long wait times).
+>- Destroying threads too slowly may starve other processes of resources.
 >
