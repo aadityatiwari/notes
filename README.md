@@ -94,3 +94,6 @@ Index of topics
 - ### **Computer Science**
 	> * garbage-collection
 	> * reference
+	> * mutex.md
+	> * semaphores.md
+	> * deadlock.md
