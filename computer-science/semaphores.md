@@ -30,11 +30,8 @@ The canonical names V and P come from the initials of [Dutch](https://en.wikiped
 
 The value of the semaphore *S* is the number of units of the resource that are currently available. The value of S can only be changed using the V and P operations.
 
->
->{**wait (P):** decrement S by 1}
->
->{**signal (V):** =&gt; increment S by 1}
->
+- {**wait (P):** decrement S by 1}
+- {**signal (V):** increment S by 1}
 
 ```
 function V(semaphore S, integer I):
