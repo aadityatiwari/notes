@@ -22,12 +22,11 @@ A deadlock situation can arise if and only if all of the following conditions ho
 A deadlock can be resolved by breaking the symmetry of the locks or of the locking mechanism.
 
 Two processes competing for two resources in opposite order.
-> 
-> (A) A single process goes through.
-> (B) The later process has to wait.
-> (C) A deadlock occurs when the first process locks the first resource at the same time as the second process locks the second resource.
-> (D) The deadlock can be resolved by cancelling and restarting the first process.
-> 
+ 
+- A: A single process goes through
+- B: The later process has to wait
+- C: A deadlock occurs when the first process locks the first resource at the same time as the second process locks the second resource
+- D: The deadlock can be resolved by cancelling and restarting the first process
 
 **Deadlock** prevention works by preventing one of the four Coffman conditions from occurring.
 
