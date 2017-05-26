@@ -97,3 +97,5 @@ Index of topics
 	> * mutex.md
 	> * semaphores.md
 	> * deadlock.md
+	> * synchronization.md
+	
