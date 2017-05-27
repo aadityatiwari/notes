@@ -42,6 +42,7 @@ Index of topics
 	> * behavioral-patterns
 	> * concurrency-patterns
 	> * double-dispatch
+	> * immutable-object
 	
 	#### *1-creational-patterns*
 	> * Abstract factory pattern
