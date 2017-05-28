@@ -34,13 +34,14 @@ Index of topics
 
 
 - ### **Design Patterns**
-	> * oop-factory
-	> * dependency-injection
-	> * software-design-patterns
 	> * creational-patterns
 	> * structural-patterns
 	> * behavioral-patterns
 	> * concurrency-patterns
+	> * problems
+	> * oop-factory
+	> * dependency-injection
+	> * software-design-patterns
 	> * double-dispatch
 	> * immutable-object
 	
@@ -84,6 +85,9 @@ Index of topics
 	> * Thread-local_storage
 	> * Thread pool
 	> * Scheduling
+	
+	#### *problems*
+	> * producer-consumer problem
 
 
 - ### **Computer Architecture**
