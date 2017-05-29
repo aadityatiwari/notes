@@ -88,6 +88,8 @@ Index of topics
 	
 	#### *problems*
 	> * producer-consumer problem
+	> * readers-writers problem
+	> * dining-philosophers problem
 
 
 - ### **Computer Architecture**
