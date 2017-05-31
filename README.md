@@ -105,4 +105,6 @@ Index of topics
 	> * semaphores.md
 	> * deadlock.md
 	> * synchronization.md
+	> * covariance-and-contravariance.md
 	
+
