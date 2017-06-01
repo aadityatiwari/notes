@@ -106,5 +106,7 @@ Index of topics
 	> * deadlock.md
 	> * synchronization.md
 	> * covariance-and-contravariance.md
+	> * futures_promises.md
+
 	
 
