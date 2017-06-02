@@ -31,6 +31,7 @@ Index of topics
 	> * java-class-file
 	> * java-bytecode
 	> * java-annotation
+	> * generics
 
 
 - ### **Design Patterns**
