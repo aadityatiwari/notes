@@ -207,3 +207,97 @@ The use of [primitive types](https://en.wikipedia.org/wiki/Primitive_type) is no
 ```java
 Entry<int, int> pair; // Fails compilation. Use Integer instead.
 ```
+
+
+**Problems with type erasure**
+--------
+
+Generics are checked at compile-time for type-correctness. The compile-time check guarantees that the resulting code is type-correct.
+
+**Type erasure** refers to the [compile-time](https://en.wikipedia.org/wiki/Compile_time) process by which explicit [type annotation](https://en.wikipedia.org/wiki/Type_signature) are removed from a program, before it is executed at [run-time](https://en.wikipedia.org/wiki/Run_time_(program_lifecycle_phase)). 
+
+Because of type erasure, type parameters cannot be determined at run-time.
+
+For example, when an ArrayList is examined at runtime, there is no general way to determine whether, before type erasure, it was an ArrayList&lt;Integer&gt; or an ArrayList&lt;Float&gt;. Many people are dissatisfied with this restriction
+
+Another effect of type erasure is that a generic class cannot extend the Throwable class in any way, directly or indirectly.
+```java
+public class GenericException<T> extends Exception // Compilation-error
+```
+Due to type erasure, the runtime will not know which catch block to execute, so this is prohibited by the compiler.
+
+```java
+try {
+    throw new GenericException<Integer>();
+}
+catch(GenericException<Integer> e) {
+    System.err.println("Integer");
+}
+catch(GenericException<String> e) {
+    System.err.println("String");
+}
+
+```
+
+Java generics generate only one compiled version of a generic class or function regardless of the number of parameterizing types used.
+
+The following code cannot be compiled as the type is unknown at the time of instantiation.
+
+```java
+<T> T instantiateElementType(List<T> arg) {
+     return new T(); //causes a compile error
+}
+
+```
+
+Because there is only one copy per generic class at runtime, static variables are shared among all the instances of the class, regardless of their type parameter. Consequently, the **type parameter cannot** **be used** in the declaration of **static variables or in static methods.**
+
+In the Java Collections Framework, the class List&lt;MyClass&gt; represents an ordered collection of objects of type MyClass. Upper bounds are specified using extends: A List&lt;? extends MyClass&gt; is a list of objects of some subclass of MyClass, i.e. any object in the list is guaranteed to be of type MyClass, so one can iterate over it using a variable of type MyClass
+
+```java
+public void doSomething(List<? extends MyClass> list) {
+  for(MyClass object : list) { // OK
+    // do something
+  }
+}
+
+```
+
+However, it is not guaranteed that one can add any object of type MyClass to that list:
+
+```java
+public void doSomething(List<? extends MyClass> list) {
+  MyClass m = new MyClass();
+  list.add(m); // Compile error
+}
+
+```
+
+The converse is true for lower bounds, which are specified using super: A List&lt;? super MyClass&gt; is a list of objects of some superclass of MyClass, i.e. the list is guaranteed to be able to contain any object of type MyClass, so one can add any object of type MyClass:
+
+```java
+public void doSomething(List<? super MyClass> list) {
+  MyClass m = new MyClass();
+  list.add(m); // OK
+}
+
+```
+
+However, it is not guaranteed that one can iterate over that list using a variable of type MyClass:
+
+```java
+public void doSomething(List<? super MyClass> list) {
+  for(MyClass object : list) { // Compile error
+    // do something
+  }
+}
+
+```
+
+In order to be able to do both add objects of type MyClass to the list and iterate over it using a variable of type MyClass, a List&lt;MyClass&gt; is needed, which is the only type of List that is both List&lt;? extends MyClass&gt; and List&lt;? super MyClass&gt;
+
+**Example:** Classes: A, B, C, and D where B, C, and D are direct subclass of A.
+
+The ArrayList&lt;? extends A&gt; means an ArrayList of some unknown type that extends A.
+
+That type might not be C, so you can't add a C to the ArrayList. In fact, since you don't know what the ArrayList is supposed to contain, you can't add anything to the ArrayList other than null. If you want an ArrayList that can hold any class that inherits A, use a ArrayList&lt;A&gt;.
